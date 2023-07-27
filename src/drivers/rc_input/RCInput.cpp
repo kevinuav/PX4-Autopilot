@@ -437,6 +437,8 @@ void RCInput::Run()
 			_bytes_rx += newBytes;
 		}
 
+		_rc_scan_locked = true;
+		_rc_scan_state=RC_SCAN_SBUS;//you have to force it locked if you can't use the official RC input serial port.
 		const bool rc_scan_locked = _rc_scan_locked;
 
 		switch (_rc_scan_state) {
@@ -464,7 +466,7 @@ void RCInput::Run()
 					bool sbus_frame_drop = false;
 
 					rc_updated = sbus_parse(cycle_timestamp, &_rcs_buf[0], newBytes, &_raw_rc_values[0], &_raw_rc_count, &sbus_failsafe,
-								&sbus_frame_drop, &frame_drops, input_rc_s::RC_INPUT_MAX_CHANNELS);
+								&sbus_frame_drop, &frame_drops, input_rc_s::RC_INPUT_MAX_CHANNELS,_rcs_fd,&frame_num);
 
 					if (rc_updated) {
 						// we have a new SBUS frame. Publish it.
@@ -474,6 +476,14 @@ void RCInput::Run()
 						_rc_scan_locked = true;
 					}
 				}
+
+				if (_rc_scan_locked && !_sbus2_telemetry) {
+							_sbus2_telemetry = new Sbus2Telemetry(_rcs_fd);
+						}
+
+				if (_sbus2_telemetry) {
+						_sbus2_telemetry->update(frame_num);
+						}
 
 			} else {
 				// Scan the next protocol
@@ -872,7 +882,7 @@ int RCInput::print_status()
 			break;
 
 		case RC_SCAN_SBUS:
-			PX4_INFO("SBUS frame drops: %u", sbus_dropped_frames());
+			PX4_INFO("SBUS2 Telemetry: %s", _sbus2_telemetry ? "yes" : "no");
 			break;
 
 

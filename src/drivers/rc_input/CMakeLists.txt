@@ -38,6 +38,7 @@ px4_add_module(
 		RCInput.cpp
 		crsf_telemetry.cpp
 		ghst_telemetry.cpp
+		sbus2_telemetry.cpp
 	MODULE_CONFIG
 		module.yaml
 	DEPENDS
