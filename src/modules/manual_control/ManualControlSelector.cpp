@@ -33,6 +33,9 @@
 
 #include "ManualControlSelector.hpp"
 
+static bool rc_valid=false;
+static uint64_t rc_pre_sample_time=0;
+
 void ManualControlSelector::updateValidityOfChosenInput(uint64_t now)
 {
 	if (!isInputValid(_setpoint, now)) {
@@ -48,6 +51,24 @@ void ManualControlSelector::updateWithNewInputSample(uint64_t now, const manual_
 
 	const bool update_existing_input = _setpoint.valid && (input.data_source == _setpoint.data_source);
 	const bool start_using_new_input = !_setpoint.valid;
+
+	if(input.data_source == manual_control_setpoint_s::SOURCE_RC)
+		{
+		if(now-rc_pre_sample_time<_timeout)
+		{rc_valid = true;
+	//	PX4_INFO("valid");
+		}
+		}
+		else
+		{
+		if(now-rc_pre_sample_time>_timeout)
+		{rc_valid = false;
+	//	PX4_INFO("invalid");
+		}
+		}
+
+	if(input.data_source == manual_control_setpoint_s::SOURCE_RC)rc_pre_sample_time = input.timestamp_sample;
+
 
 	// Switch to new input if it's valid and we don't already have a valid one
 	if (isInputValid(input, now) && (update_existing_input || start_using_new_input)) {
@@ -67,7 +88,7 @@ bool ManualControlSelector::isInputValid(const manual_control_setpoint_s &input,
 {
 	// Check for timeout
 	const bool sample_from_the_past = now >= input.timestamp_sample;
-	const bool sample_newer_than_timeout = now - input.timestamp_sample < _timeout;
+	const bool sample_newer_than_timeout = now - input.timestamp_sample < _timeout;//如果输入命令到现在处理隔太久就认为不可用(并不是输入信号超时)
 
 	// Check if source matches the configuration
 	const bool source_rc_matched = (_rc_in_mode == 0) && (input.data_source == manual_control_setpoint_s::SOURCE_RC);
@@ -82,9 +103,16 @@ bool ManualControlSelector::isInputValid(const manual_control_setpoint_s &input,
 	const bool source_first_matched = (_rc_in_mode == 3) &&
 					  (input.data_source == _first_valid_source
 					   || _first_valid_source == manual_control_setpoint_s::SOURCE_UNKNOWN);
+	const bool source_rc_prior = (_rc_in_mode == 5) && (((rc_valid) && (input.data_source == manual_control_setpoint_s::SOURCE_RC))
+							|| ((!rc_valid) && (input.data_source == manual_control_setpoint_s::SOURCE_MAVLINK_0
+					     || input.data_source == manual_control_setpoint_s::SOURCE_MAVLINK_1
+					     || input.data_source == manual_control_setpoint_s::SOURCE_MAVLINK_2
+					     || input.data_source == manual_control_setpoint_s::SOURCE_MAVLINK_3
+					     || input.data_source == manual_control_setpoint_s::SOURCE_MAVLINK_4
+					     || input.data_source == manual_control_setpoint_s::SOURCE_MAVLINK_5)));
 
 	return sample_from_the_past && sample_newer_than_timeout && input.valid
-	       && (source_rc_matched || source_mavlink_matched || source_any_matched || source_first_matched);
+	       && (source_rc_matched || source_mavlink_matched || source_any_matched || source_first_matched||source_rc_prior);
 }
 
 manual_control_setpoint_s &ManualControlSelector::setpoint()

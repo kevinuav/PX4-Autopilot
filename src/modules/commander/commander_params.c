@@ -167,15 +167,17 @@ PARAM_DEFINE_INT32(COM_HOME_IN_AIR, 0);
  * A value of 2 allows either RC Transmitter or Joystick input. The first valid input is used, will fallback to other sources if the input stream becomes invalid.
  * A value of 3 allows either input from RC or joystick. The first available source is selected and used until reboot.
  * A value of 4 ignores any stick input.
+ * A value of 5 using the input from RC first rather than joystick when they are both available until the RC signal is lost.
  *
  * @group Commander
  * @min 0
- * @max 4
+ * @max 5
  * @value 0 RC Transmitter only
  * @value 1 Joystick only
  * @value 2 RC and Joystick with fallback
  * @value 3 RC or Joystick keep first
  * @value 4 Stick input disabled
+ * @value 5 RC Transmitter prior than Joystick
  */
 PARAM_DEFINE_INT32(COM_RC_IN_MODE, 3);
 
