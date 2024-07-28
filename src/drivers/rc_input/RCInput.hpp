@@ -62,11 +62,13 @@
 
 #include "crsf_telemetry.h"
 #include "ghst_telemetry.hpp"
+#include "sbus2_telemetry.hpp"
 
 #ifdef HRT_PPM_CHANNEL
 # include <systemlib/ppm_decode.h>
 #endif
 
+uint8_t frame_num=0;
 class RCInput : public ModuleBase<RCInput>, public ModuleParams, public px4::ScheduledWorkItem
 {
 public:
@@ -160,6 +162,7 @@ private:
 
 	CRSFTelemetry *_crsf_telemetry{nullptr};
 	GHSTTelemetry *_ghst_telemetry{nullptr};
+	Sbus2Telemetry *_sbus2_telemetry{nullptr};
 
 	perf_counter_t	_cycle_perf;
 	perf_counter_t	_publish_interval_perf;

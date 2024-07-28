@@ -1,0 +1,7 @@
+module_name: Jet Engine driver
+serial_config:
+    - command: jetengine start -d ${SERIAL_DEV}
+      port_config_param:
+        name: JETENGINE_CFG
+        group: JetEngine
+

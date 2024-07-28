@@ -134,7 +134,7 @@ sbus_dropped_frames()
 
 static bool
 sbus_decode(uint64_t frame_time, uint8_t *frame, uint16_t *values, uint16_t *num_values,
-	    bool *sbus_failsafe, bool *sbus_frame_drop, uint16_t max_values);
+	    bool *sbus_failsafe, bool *sbus_frame_drop, uint16_t max_values,uint8_t *frame_num);
 
 int
 sbus_init(const char *device, bool singlewire)
@@ -195,7 +195,8 @@ sbus_config(int sbus_fd, bool singlewire)
 		/* 100000bps, even parity, two stop bits */
 		tcgetattr(sbus_fd, &t);
 		cfsetspeed(&t, 100000);
-		t.c_cflag |= (CSTOPB | PARENB);
+		t.c_cflag |= ( PARENB);
+		t.c_cflag &= ~CSTOPB; //两个停止位会让最后一个slot不能工作，改成一个停止位
 		tcsetattr(sbus_fd, TCSANOW, &t);
 
 		if (singlewire) {
@@ -314,13 +315,14 @@ sbus_input(int sbus_fd, uint16_t *values, uint16_t *num_values, bool *sbus_fails
 	/*
 	 * Try to decode something with what we got
 	 */
+	uint8_t a=0;
 	return sbus_parse(now, &buf[0], ret, values, num_values, sbus_failsafe,
-			  sbus_frame_drop, &sbus_frame_drops, max_channels);
+                          sbus_frame_drop, &sbus_frame_drops, max_channels,&a);
 }
 
 bool
 sbus_parse(uint64_t now, uint8_t *frame, unsigned len, uint16_t *values,
-	   uint16_t *num_values, bool *sbus_failsafe, bool *sbus_frame_drop, unsigned *frame_drops, uint16_t max_channels)
+	   uint16_t *num_values, bool *sbus_failsafe, bool *sbus_frame_drop, unsigned *frame_drops, uint16_t max_channels,uint8_t *frame_num)
 {
 
 	last_rx_time = now;
@@ -391,7 +393,7 @@ sbus_parse(uint64_t now, uint8_t *frame, unsigned len, uint16_t *values,
 				/*
 				 * Great, it looks like we might have a frame. Go ahead and decode it.
 				 */
-				decode_ret = sbus_decode(now, sbus_frame, values, num_values, sbus_failsafe, sbus_frame_drop, max_channels);
+				decode_ret = sbus_decode(now, sbus_frame, values, num_values, sbus_failsafe, sbus_frame_drop, max_channels,frame_num);
 
 				/*
 				 * Offset recovery: If decoding failed, check if there is a second
@@ -566,7 +568,7 @@ static const struct sbus_bit_pick sbus_decoder[SBUS_INPUT_CHANNELS][3] = {
 
 bool
 sbus_decode(uint64_t frame_time, uint8_t *frame, uint16_t *values, uint16_t *num_values,
-	    bool *sbus_failsafe, bool *sbus_frame_drop, uint16_t max_values)
+	    bool *sbus_failsafe, bool *sbus_frame_drop, uint16_t max_values,uint8_t *frame_num)
 {
 
 	/* check frame boundary markers to avoid out-of-sync cases */
@@ -589,26 +591,31 @@ sbus_decode(uint64_t frame_time, uint8_t *frame, uint16_t *values, uint16_t *num
 	switch (frame[24]) {
 	case 0x00:
 		/* this is S.BUS 1 */
+		*frame_num=(uint8_t)0;
 		sbus_decode_state = SBUS2_DECODE_STATE_SBUS1_SYNC;
 		break;
 
 	case 0x04:
 		/* receiver voltage */
+		*frame_num=(uint8_t)0;
 		sbus_decode_state = SBUS2_DECODE_STATE_SBUS2_RX_VOLTAGE;
 		break;
 
 	case 0x14:
 		/* GPS / baro */
+		*frame_num=(uint8_t)1;
 		sbus_decode_state = SBUS2_DECODE_STATE_SBUS2_GPS;
 		break;
 
 	case 0x24:
 		/* Unknown SBUS2 data */
+		*frame_num=(uint8_t)2;
 		sbus_decode_state = SBUS2_DECODE_STATE_SBUS2_SYNC;
 		break;
 
 	case 0x34:
 		/* Unknown SBUS2 data */
+		*frame_num=(uint8_t)3;
 		sbus_decode_state = SBUS2_DECODE_STATE_SBUS2_SYNC;
 		break;
 

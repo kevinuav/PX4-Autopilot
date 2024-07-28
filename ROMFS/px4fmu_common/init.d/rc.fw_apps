@@ -17,6 +17,7 @@ fw_rate_control start
 fw_att_control start
 fw_pos_control start
 airspeed_selector start
+jetengine start -d dev/ttyS3 -b 115200
 
 #
 # Start attitude control auto-tuner

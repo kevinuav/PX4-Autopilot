@@ -692,6 +692,12 @@ ControlAllocator::publish_actuator_controls()
 		actuator_motors.control[i] = NAN;
 	}
 
+	_jec_sub.update(&_jec);
+
+	if(_jec.throttle==jet_engine_ctl_s::EC_DISARM)actuator_motors.control[0] = NAN;
+	else if(_jec.throttle==jet_engine_ctl_s::EC_MIN)actuator_motors.control[0] = 0.0f;
+	else if(_jec.throttle==jet_engine_ctl_s::EC_MAX)actuator_motors.control[0] = 1.0f;
+
 	_actuator_motors_pub.publish(actuator_motors);
 
 	// servos

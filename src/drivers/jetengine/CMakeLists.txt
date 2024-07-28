@@ -1,6 +1,6 @@
 ############################################################################
 #
-#   Copyright (c) 2015 PX4 Development Team. All rights reserved.
+#   Copyright (c) 2017-2019 PX4 Development Team. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -31,16 +31,21 @@
 #
 ############################################################################
 px4_add_module(
-	MODULE drivers__rc_input
-	MAIN rc_input
-	COMPILE_FLAGS
+	MODULE drivers__jetengine
+	MAIN jetengine
+	STACK_MAIN 2000
 	SRCS
-		RCInput.cpp
-		crsf_telemetry.cpp
-		ghst_telemetry.cpp
-		sbus2_telemetry.cpp
-	MODULE_CONFIG
-		module.yaml
+		engine/linton.hpp
+		engine/linton.cpp
+		engine/jetcat.hpp
+		engine/jetcat.cpp
+		engine/gasengine.hpp
+		engine/gasengine.cpp
+		engine/none.hpp
+		engine/none.cpp
+		JetEngine.cpp
+		JetEngine.hpp
+		engine/je_helper.h
 	DEPENDS
-		rc
+		px4_work_queue
 	)

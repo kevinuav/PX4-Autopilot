@@ -183,8 +183,10 @@ void SbusRc::Run()
 			bool sbus_frame_drop = false;
 			unsigned sbus_frame_drops = 0;
 
+			uint8_t a=0;
+
 			if (sbus_parse(cycle_timestamp, &rcs_buf[0], newBytes, &raw_rc_values[0], &raw_rc_count,
-				       &sbus_failsafe, &sbus_frame_drop, &sbus_frame_drops, input_rc_s::RC_INPUT_MAX_CHANNELS)
+				       &sbus_failsafe, &sbus_frame_drop, &sbus_frame_drops, input_rc_s::RC_INPUT_MAX_CHANNELS,&a)
 			   ) {
 				// we have a new SBUS frame. Publish it.
 				input_rc_s input_rc{};

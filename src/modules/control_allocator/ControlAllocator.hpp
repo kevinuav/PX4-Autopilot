@@ -78,6 +78,7 @@
 #include <uORB/topics/vehicle_thrust_setpoint.h>
 #include <uORB/topics/vehicle_status.h>
 #include <uORB/topics/failure_detector_status.h>
+#include <uORB/topics/jet_engine_ctl.h>
 
 class ControlAllocator : public ModuleBase<ControlAllocator>, public ModuleParams, public px4::ScheduledWorkItem
 {
@@ -143,6 +144,8 @@ private:
 	int _num_control_allocation{0};
 	hrt_abstime _last_effectiveness_update{0};
 
+	jet_engine_ctl_s _jec;
+
 	enum class EffectivenessSource {
 		NONE = -1,
 		MULTIROTOR = 0,
@@ -190,6 +193,8 @@ private:
 	uORB::Subscription _vehicle_status_sub{ORB_ID(vehicle_status)};
 	uORB::Subscription _vehicle_control_mode_sub{ORB_ID(vehicle_control_mode)};
 	uORB::Subscription _failure_detector_status_sub{ORB_ID(failure_detector_status)};
+
+	uORB::Subscription _jec_sub{ORB_ID(jet_engine_ctl)};
 
 	matrix::Vector3f _torque_sp;
 	matrix::Vector3f _thrust_sp;

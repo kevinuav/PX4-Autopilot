@@ -91,6 +91,9 @@ set(msg_files
 	EstimatorStatus.msg
 	EstimatorStatusFlags.msg
 	Event.msg
+	EngineStatus.msg
+	JetEngineCtl.msg
+	EtCommand.msg
 	FigureEightStatus.msg
 	FailsafeFlags.msg
 	FailureDetectorStatus.msg

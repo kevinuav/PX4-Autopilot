@@ -94,7 +94,7 @@ void ActuatorEffectiveness::stopMaskedMotorsWithZeroThrust(uint32_t stoppable_mo
 
 			// Stop motor if its setpoint is below 2%. This value was determined empirically (RC stick inaccuracy)
 			if (fabsf(actuator_sp(actuator_idx)) < .02f) {
-				_stopped_motors_mask |= motor_mask;
+				_stopped_motors_mask &= ~motor_mask;
 
 			} else {
 				_stopped_motors_mask &= ~motor_mask;

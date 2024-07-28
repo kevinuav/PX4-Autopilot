@@ -464,6 +464,7 @@ void RCInput::Run()
 			_bytes_rx += newBytes;
 		}
 
+		_rc_scan_locked = true;
 		const bool rc_scan_locked = _rc_scan_locked;
 
 		switch (_rc_scan_state) {
@@ -491,7 +492,7 @@ void RCInput::Run()
 					bool sbus_frame_drop = false;
 
 					rc_updated = sbus_parse(cycle_timestamp, &_rcs_buf[0], newBytes, &_raw_rc_values[0], &_raw_rc_count, &sbus_failsafe,
-								&sbus_frame_drop, &frame_drops, input_rc_s::RC_INPUT_MAX_CHANNELS);
+								&sbus_frame_drop, &frame_drops, input_rc_s::RC_INPUT_MAX_CHANNELS,&frame_num);
 
 					if (rc_updated) {
 						// we have a new SBUS frame. Publish it.
@@ -504,6 +505,14 @@ void RCInput::Run()
 						}
 					}
 				}
+
+				if (_rc_scan_locked && !_sbus2_telemetry) {
+							_sbus2_telemetry = new Sbus2Telemetry(_rcs_fd);
+						}
+
+				if (_sbus2_telemetry) {
+						_sbus2_telemetry->update(frame_num);
+					}
 
 			} else {
 				// Scan the next protocol
