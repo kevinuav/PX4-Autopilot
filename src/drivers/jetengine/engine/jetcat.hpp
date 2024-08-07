@@ -58,7 +58,6 @@
 #include <uORB/topics/engine_status.h>
 #include <uORB/topics/parameter_update.h>
 #include <uORB/topics/et_command.h>
-#include <uORB/topics/jet_engine_ctl.h>
 #include <px4_platform_common/px4_config.h>
 #include <px4_platform_common/defines.h>
 
@@ -143,11 +142,9 @@ private:
 
 	 int cmdwpe(uint8_t en,float thr);
 
-	 int uart_init();
-
 	 int send_cmd(uint8_t);
 
-	 int set_opt(int,int,int,char,int);
+	 int setbaud();
 
 	// uORB::Subscription	_actuator_sub{ORB_ID(actuator_controls_0)};
 
@@ -163,6 +160,8 @@ private:
 		(ParamInt<px4::params::JE_M>)          _EC_M,
 		(ParamInt<px4::params::JE_N>)          _E_N
 	)
+
+	#define JETCAT_BAUDRATE 115200
 
 	 /*
 	 typedef enum

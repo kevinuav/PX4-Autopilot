@@ -242,6 +242,9 @@ JetEngine::run()
 					px4_sleep(1);
 					continue;
 				}
+			}else
+			{
+				_baudrate = _je_br.get();
 			}
 
 			// Open the UART. If this is successful then the UART is ready to use.
@@ -286,6 +289,11 @@ JetEngine::run()
 		default:
 		return;
 	}
+
+	if(_baudrate)_uart.setBaudrate(_baudrate);
+
+	px4_sleep(1);
+
 	static int    estatus=engine_status_s::UNINIT;
 	static bool para_ini=0,para_got=0,para_setted=0;
 	static int i=0, max_para=0;
@@ -476,16 +484,13 @@ int JetEngine::pollOrRead(uint8_t *buf, size_t buf_length, int timeout)//封装�
 
 int JetEngine::setBaudrate(unsigned baud)
 {
-		if (_uart.setBaudrate(baud)) {//串口API再封装一层
-			return 0;
-			}
-
+		if (_uart.setBaudrate(baud)) return 1;
 	return -1;
 }
 
-int JetEngine::setPWM(uint16_t thr_cmd,uint16_t starter_pwm)
+int JetEngine::setPWM(uint16_t thr_pwm,uint16_t starter_pwm)
 {
-	_jec.throttle = thr_cmd;
+	_jec.throttle = thr_pwm;
 	_jec.starter = starter_pwm;
 	_je_ctl_pub.publish(_jec);
 	return 1;

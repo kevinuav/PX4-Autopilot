@@ -66,24 +66,13 @@ Jetcat::Jetcat( JECallbackPtr  callback, void *callback_user,struct engine_statu
 	_ec_m=_EC_M.get();
 	_e_n=_E_N.get();
 	_engine_status=engine_status;
-	uart_init();
+	setbaud();
 }
 
 Jetcat::~Jetcat()
 {
 
 }
-
-
-int
-Jetcat::uart_init()
-{
-	//setBaudrate(115200);
-	//set_opt(_uart4, _Baudrate, 8, 'N', 1);
-	return 1;
-}
-
-
 
 int
 Jetcat::waiting()
@@ -309,7 +298,7 @@ Jetcat::collect()
 				/* if we have new data from ECU, go handle it */
 				bytes_count = ret;
 			}
-			PX4_INFO("before:%.*s\n received:%d",bytes_count,_buf,bytes_count);
+			//PX4_INFO("before:%.*s\n received:%d",bytes_count,_buf,bytes_count);
 		/* pass received bytes to the packet decoder */
 			while (j < bytes_count) {
 				int l = 0;
@@ -357,6 +346,8 @@ int Jetcat::parseChar(uint8_t b)
 	else if(a2=='X'&&a1=='L'&&a0=='O'){_sent_cmd=jetcat_cmd_t::XLO;getcmd=1;}
 	else if(a2=='S'&&a1=='L'&&a0=='O'){_sent_cmd=jetcat_cmd_t::SLO;getcmd=1;}
 
+	if(_rx_buffer_bytes>=JE_READ_BUFFER_SIZE-1)_rx_buffer_bytes = 0; //reset the buffer pointer if too long to get the needed '\r', or it will hard fault
+
 	if(a2=='H'&&a1=='S'&&a0==',')
 	{
 		char e_id = (char)a4;
@@ -397,11 +388,11 @@ int Jetcat::handle(int len)
 		if (_rx_buffer[i] == ',') { uiCalcComma++; } //the correct number of comma= number of parameters
 	}
 
-	char *bufptr = (char *)(_rx_buffer + 2);
+	char *bufptr = (char *)_rx_buffer+2; //The offset of the characters "OK"
 	int ret = 0;
 
-	PX4_INFO("received cmd %d ",(int)_sent_cmd);
-	PX4_INFO("after:%.*s\n",len,_rx_buffer);
+	//PX4_INFO("received cmd %d ",(int)_sent_cmd);
+	//PX4_INFO("after:%.*s\n",len,_rx_buffer);
 
 	static double pump_v=0.0;
 
@@ -667,13 +658,13 @@ Jetcat::pwm_start() //the pwm starting mode is according to jetcat's SEQUENCE st
 //	px4_sleep(1); //1s
 //		setThr(1,0);//set the pwm to the throttle's minimum value 这100是disarm值
 //	px4_usleep(500000);//1.5s
-		setThr(jet_engine_ctl_s::EC_MIN,0);//set the throttle to minimum with the "trim" //其中100是disarm的值，200是微调值
+		setThr(2,0);//set the throttle to minimum with the "trim" //其中100是disarm的值，200是微调值
 	px4_sleep(1);//2.5s
-		setThr(jet_engine_ctl_s::EC_MAX,0);//"push" the throttle to maximum
+		setThr(3,0);//"push" the throttle to maximum
 	px4_sleep(1);//3.5s
-		setThr(jet_engine_ctl_s::EC_MIN,0); //finally "pull" it back to minimun with trim
+		setThr(2,0); //finally "pull" it back to minimun with trim
 	px4_sleep(1);//4.5s
-		setThr(jet_engine_ctl_s::EC_FREE,0);
+		setThr(0,0);
 		return 1;
 }
 
@@ -751,4 +742,9 @@ Jetcat::cmdwpe(uint8_t en,float thr)
 //	_sent_cmd=jetcat_cmd_t::wpe;
 	collect();
 	return 1;
+}
+
+int Jetcat::setbaud()
+{
+	return setBaudrate(JETCAT_BAUDRATE);
 }

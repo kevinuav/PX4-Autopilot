@@ -91,6 +91,8 @@ public:
 
 	 int handlefault();
 
+	 int setbaud();
+
 	 int getJEpara(); //send a query message for the engine parameter everytime. return false if there is para unsend.else it returns true while it finishes.
 
 	 int setJEpara();// set the different parameter between FC and the engine. It returns false while there is different parameter unset.And it returns true while the job has done.

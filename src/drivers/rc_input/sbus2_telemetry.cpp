@@ -560,7 +560,7 @@ Sbus2Telemetry:: send_jetcat(
    value = status;
    bytes[0] = 0;
    bytes[1] = value;
-   send_sbs2(slot_num+13,bytes);
+   send_sbs2(slot_num+12,bytes); // 经实验，第13个slot的确是第二轴的数据，故推测第12个slot应该就是状态slot
 
 
 return PX4_OK;

@@ -186,6 +186,10 @@ None::period2rpm(double period)
 	}else return 0.f;
 }
 
+int None::setbaud()
+{
+	return 1;
+}
 
 
 

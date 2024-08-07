@@ -160,7 +160,7 @@ private:
 
 	double				_trigger_n;					//trigger times every round of the propeller
 
-	unsigned						_baudrate{0};					///< current baudrate
+	unsigned			_baudrate{0};					///< current baudrate
 	const unsigned			_configured_baudrate{0};			///< configured baudrate (0=auto-detect)
 	char				_port[20] {};
 

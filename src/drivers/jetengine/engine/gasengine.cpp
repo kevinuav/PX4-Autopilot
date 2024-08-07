@@ -260,5 +260,8 @@ GasEngine::period2rpm(double period)
 	}else return 0.f;
 }
 
-
+int GasEngine::setbaud()
+{
+	return 1;
+}
 

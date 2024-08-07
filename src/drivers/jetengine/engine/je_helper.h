@@ -238,7 +238,7 @@ protected:
 
 
 
-	int _Baudrate = 115200;
+	int _Baudrate = 0;
 
 	int _fd;
 
