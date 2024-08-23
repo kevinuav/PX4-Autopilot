@@ -58,6 +58,7 @@
 #include <uORB/topics/airspeed.h>
 #include <uORB/topics/vehicle_attitude.h>
 #include <uORB/topics/home_position.h>
+#include <uORB/topics/rpm.h>
 
 using matrix::Eulerf;
 using matrix::Quatf;
@@ -189,6 +190,7 @@ private:
 	uORB::Subscription	_atemp_sub{ORB_ID(airspeed)};
 	uORB::Subscription	_att_sub{ORB_ID(vehicle_attitude)};
 	uORB::Subscription	_home_sub{ORB_ID(home_position)};
+	uORB::Subscription	_rpm_sub{ORB_ID(rpm)};
 
 
 	DEFINE_PARAMETERS(
@@ -218,6 +220,7 @@ private:
 	airspeed_s			_atemp{};
 	vehicle_attitude_s 		_att{};
 	home_position_s			_home{};
+	rpm_s				_rpm{};
 
 	matrix::Dcmf _R{matrix::eye<float, 3>()};
 

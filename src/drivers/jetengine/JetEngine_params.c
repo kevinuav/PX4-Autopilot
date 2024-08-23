@@ -171,10 +171,10 @@ PARAM_DEFINE_FLOAT(R_N, 1);
  *
  *
  * @group Jet Engine
- * @value 0  	0
- * @value 9600  9600
- * @value 38400 38400
- * @value 57600 57600
+ * @value 0      0
+ * @value 9600   9600
+ * @value 38400  38400
+ * @value 57600  57600
  * @value 115200 115200
  * @value 230400 230400
  */
@@ -194,6 +194,7 @@ PARAM_DEFINE_INT32(JE_R, 10);
 /**
  * engine's control mode
  *
+ * The engine's control mode, directly control by PWM or control by serial
  *
  * @group Jet Engine
  * @value 0 PWM

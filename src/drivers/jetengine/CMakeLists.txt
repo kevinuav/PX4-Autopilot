@@ -46,6 +46,8 @@ px4_add_module(
 		JetEngine.cpp
 		JetEngine.hpp
 		engine/je_helper.h
+	MODULE_CONFIG
+		module.yaml
 	DEPENDS
 		px4_work_queue
 	)

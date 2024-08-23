@@ -52,7 +52,7 @@
 #include <uORB/topics/mavlink_log.h>
 #include <systemlib/mavlink_log.h>
 
-  orb_advert_t mavlink_log_pub; /*除了V5飞控的编译中要加extern才能链接通过，
+ orb_advert_t mavlink_log_pub; /*除了V5飞控的编译中要加extern才能链接通过，
 					其糨的飞控要去掉extern才能过，否则会被提示变量重定义*/
 
 
@@ -262,8 +262,6 @@ JetEngine::run()
 			}
 
 	_e_type = _engine_type.get();
-
-	_ec_rate = _ec_r.get();
 
 	_engine_status.engine_type = _e_type;
 
@@ -499,6 +497,7 @@ int JetEngine::setPWM(uint16_t thr_pwm,uint16_t starter_pwm)
 int
 JetEngine::publish()
 {
+	_engine_status.timestamp = hrt_absolute_time();
 	_engine_status_pub.publish(_engine_status);
 	return 1;
 }

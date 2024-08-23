@@ -181,7 +181,7 @@ Sbus2Telemetry::update(uint8_t frame_num)
 
   		if(_batt_sub.update(&_batt)&&(_batt_slot_num>0)) // update battery's voltage and current
 		{
-			send_batt(_batt.current_average_a,_batt.voltage_v,_batt.discharged_mah,_batt_slot_num);
+			send_batt(_batt.current_a,_batt.voltage_v,_batt.discharged_mah,_batt_slot_num);
 		}
 
 		if(_as_sub.update(&_as)&&(_as_slot_num>0)) //update airspeed
@@ -222,11 +222,13 @@ Sbus2Telemetry::update(uint8_t frame_num)
 			//PX4_INFO("yaw update:%f",(double)yaw);
 		}
 
+		if(_rpm_sub.update(&_rpm)&&_rpm_slot_num>0)
+		{
+		send_rpm((uint64_t)_rpm.indicated_frequency_rpm,_rpm_slot_num);
+		}
+
 		if(_es_sub.update(&_es)&&(_jc_slot_num>0)) //update engine status: 1 update jetengine's status as jetcat. The other engines status update as the propeller(not jet)
 		{
-			if(_es.engine_type==0||_es.engine_type==4)
-			send_rpm(_es.rpm[0],_rpm_slot_num);
-			else
 			send_jetcat(_es.rpm[0],_es.egt[0],_es.vol[0],_es.thr_sp,_es.engine_load[0],_es.fuel_remain,1.5,(uint32_t)f_toint32(_global.alt),86,_batt.voltage_v,1.85,_as.indicated_airspeed_m_s*3.6f,_es.status[0],_jc_slot_num);
 		}
 
@@ -558,7 +560,7 @@ Sbus2Telemetry:: send_jetcat(
 
    // Status and Error Code
    value = status;
-   bytes[0] = 0;
+   bytes[0] = value>>8;
    bytes[1] = value;
    send_sbs2(slot_num+12,bytes); // 经实验，第13个slot的确是第二轴的数据，故推测第12个slot应该就是状态slot
 

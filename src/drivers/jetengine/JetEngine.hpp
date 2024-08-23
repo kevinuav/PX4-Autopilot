@@ -156,8 +156,6 @@ private:
 
 	int				_e_type={1};
 
-	uint32_t			_ec_rate={10};					//engine control rate
-
 	double				_trigger_n;					//trigger times every round of the propeller
 
 	unsigned			_baudrate{0};					///< current baudrate
@@ -179,7 +177,6 @@ private:
 		(ParamInt<px4::params::PWM_MAIN_DIS3>) _rc3_stop,
 		(ParamInt<px4::params::ENGINE_TYPE>) _engine_type,
 		(ParamInt<px4::params::JE_BR>) _je_br,
-		(ParamInt<px4::params::JE_R>) _ec_r,
 		(ParamInt<px4::params::JE_N>) _E_N
 	)
 /*

@@ -85,11 +85,9 @@ Jetcat::waiting()
 	while(1)
 	{
 	PX4_INFO("standby");
-//	PX4_INFO("_status%d",(int)_status);
 		cmdrac(i);
 		cmdra1(i);
 		cmdrfi(i);
-//	cmdwpe(i,(double)getthr());
 		_status[i-1] = 0;
 		if(i<_e_n)i++;
 		else i=1;
@@ -346,8 +344,6 @@ int Jetcat::parseChar(uint8_t b)
 	else if(a2=='X'&&a1=='L'&&a0=='O'){_sent_cmd=jetcat_cmd_t::XLO;getcmd=1;}
 	else if(a2=='S'&&a1=='L'&&a0=='O'){_sent_cmd=jetcat_cmd_t::SLO;getcmd=1;}
 
-	if(_rx_buffer_bytes>=JE_READ_BUFFER_SIZE-1)_rx_buffer_bytes = 0; //reset the buffer pointer if too long to get the needed '\r', or it will hard fault
-
 	if(a2=='H'&&a1=='S'&&a0==',')
 	{
 		char e_id = (char)a4;
@@ -359,6 +355,7 @@ int Jetcat::parseChar(uint8_t b)
 	{
 		if(!getcmd)
 		{
+		if(_rx_buffer_bytes>=JE_READ_BUFFER_SIZE)_rx_buffer_bytes = 0; //reset the buffer pointer if too long to get the needed '\r', or it will hard fault
 		_rx_buffer[_rx_buffer_bytes++] = b;
 		iRet = _rx_buffer_bytes;
 		}
@@ -366,6 +363,7 @@ int Jetcat::parseChar(uint8_t b)
 	}
 	else
 	{
+		if(_rx_buffer_bytes>=JE_READ_BUFFER_SIZE)_rx_buffer_bytes = 0; //reset the buffer pointer if too long to get the needed '\r', or it will hard fault
 		_rx_buffer[_rx_buffer_bytes++] = b;
 		return 0;
 	}

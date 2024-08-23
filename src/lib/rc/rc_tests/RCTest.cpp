@@ -374,9 +374,11 @@ bool RCTest::sbus2Test()
 		// Pipe the data into the parser
 		hrt_abstime now = hrt_absolute_time();
 
+		uint8_t a = 5;
+
 		// if (rate_limiter % byte_offset == 0) {
 		bool result = sbus_parse(now, &frame[0], len, rc_values, &num_values,
-					 &sbus_failsafe, &sbus_frame_drop, &sbus_frame_drops, max_channels);
+					 &sbus_failsafe, &sbus_frame_drop, &sbus_frame_drops, max_channels,&a);
 
 		if (result) {
 			//PX4_INFO("decoded packet");

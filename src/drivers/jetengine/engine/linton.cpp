@@ -328,7 +328,7 @@ int Linton::parseChar(uint8_t b)
 	}
 	else
 	{
-		if(_rx_buffer_bytes>=JE_READ_BUFFER_SIZE-1)_rx_buffer_bytes = 0; //reset the buffer pointer if too long to get the needed '\r', or it will hard fault
+		if(_rx_buffer_bytes>=JE_READ_BUFFER_SIZE)_rx_buffer_bytes = 0; //reset the buffer pointer if too long to get the needed '\r', or it will hard fault
 		_rx_buffer[_rx_buffer_bytes++] = b;
 		return 0;
 	}
