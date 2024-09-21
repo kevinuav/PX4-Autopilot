@@ -72,18 +72,31 @@ int
 None::waiting()
 {
 	_engine_status->e_n=_e_n;
-	return true;
+	while(1)
+	{
+	publish();
+	if(getarm())return 1;
+	}
 }
 
 int
 None::start()
 {
+	while(1)
+	{
+	if(getarm())
 	return true;
+	else return 0;
+	}
+
 }
 
 int
 None::runn()
 {
+	while(1)
+	{
+	PX4_INFO("running");
 	if(_rpm1>100){_engine_status->status[0]=engine_state::running;}else{_engine_status->status[0]=engine_state::idle; }
 	if(_rpm2>100){_engine_status->status[1]=engine_state::running;}else{_engine_status->status[1]=engine_state::idle; }
 	if(_rpm1>100&&_e_n==1)
@@ -98,7 +111,9 @@ None::runn()
 
 	if(_rpm1>3400){_engine_status->status[0]=engine_state::maximum_power;}
 	if(_rpm2>3400){_engine_status->status[1]=engine_state::maximum_power;}
-	return 0;
+	publish();
+	if(!getarm())return 1;
+	}
 }
 
 int
